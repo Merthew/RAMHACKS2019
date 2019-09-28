@@ -1,0 +1,45 @@
+<html>
+	<head>
+		<title>Entry for ramhacks2019</title>
+	</head>
+	<body>
+		
+		
+		
+		
+		
+
+		<script src="https://www.gstatic.com/firebasejs/7.0.0/firebase.js"></script>
+		
+
+		<script>
+		// Your web app's Firebase configuration
+		var firebaseConfig = {
+			apiKey: "AIzaSyDrcLe6_5LBPf_xsfCoWOGkFQepLz004SQ",
+			authDomain: "ramhacks2019-24f47.firebaseapp.com",
+			databaseURL: "https://ramhacks2019-24f47.firebaseio.com",
+			projectId: "ramhacks2019-24f47",
+			storageBucket: "",
+			messagingSenderId: "356820442691",
+			appId: "1:356820442691:web:98a4bd51bcdf1b16e97ef6",
+			measurementId: "G-9P34LYCGV8"
+		};
+		// Initialize Firebase
+		var fb = firebase.initializeApp(firebaseConfig);
+		  
+		  
+		  
+
+		function setInfo() {
+			fb.database().ref('users').set({
+			username: "asdf",
+			email: "asdf",
+			profile_picture : "asdf"
+		  });
+		}
+		</script>
+		
+		
+	</body>
+	<b> hi</b>
+</html>
