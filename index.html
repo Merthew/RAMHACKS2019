@@ -1,11 +1,16 @@
 <html>
 	<head>
-		<script type="text/javascript" src="main.js"></script>
+		
 		<title>Nulla Ipsum</title>
 	</head>
 	<body>
 		HELLO THERE
 	</body>
-	
+	<script type="text/javascript" src="main.js"></script>
+	<?php
+		// outputs the username that owns the running php/httpd process
+		// (on a system with the "whoami" executable in the path)
+		echo exec('main.py');
+	?>
 	
 </html>
