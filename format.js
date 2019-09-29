@@ -121,6 +121,7 @@ function createSearchFlags(){
 	document.getElementById("searchBar").appendChild(bsub);
 }
 
+
 var queryList = [];
 
 function drawAvalibilities(){
@@ -152,14 +153,14 @@ function drawAvalibilities(){
 		var objRef = fb.collection(name);
 		for(let i = 1; i < flags.length; i++){
 			if(param[i] != null){
-				if(typeof param[i] == 'number'){
+				if(types[i] == "int"){
 					console.log("current element is a number");
 					let key = "flags." + flags[i];
-					var query = objRef.where(key, ">=", param[i]);
+					var query = objRef.where(key, ">=", parseInt(param[i]));
 					query.get().then(function(querySnapshot) {
 						querySnapshot.forEach(function(doc) {
-							console.log(doc.id, " => ", doc.data());
-							queryList.push([i, doc.id]);
+							console.log(doc.id);
+							queryList.push({"n" + i,doc.id});
 						});
 					}).catch(function(error) {
 						console.log("Error getting documents: ", error);
@@ -172,8 +173,8 @@ function drawAvalibilities(){
 					
 					query.get().then(querySnapshot => {
 						querySnapshot.forEach( doc => {
-							console.log(doc.id, " => ", doc.data());
-							queryList.push([i, doc.id]);
+							console.log(doc.id);
+							queryList.push({"n" + i, doc.id});
 						});
 					}).catch(function(error) {
 						console.log("Error getting documents: ", error);
@@ -181,19 +182,23 @@ function drawAvalibilities(){
 				}
 			}
 			else {
-				console.log("Everything null?");
+				console.log("this is null");
 			}
 		}
 		
 		
 		var iDate = document.getElementById("Idate").value;
 		resolve(iDate);
-	}).then(is => {
-		console.log(queryList);
+	}).finally(is => {
 		
-		for(let i = 0; i < queryList.length; i ++){
+		
+
+		console.log(queryList);
+
+
+		//for(let i = 0; i < queryList.length; i ++){
 			//drawEntry(
-		}
+		//}
 	});
 	
 }
