@@ -3,19 +3,25 @@
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<title>Entry for ramhacks2019</title>
 	</head>
-	<body>
+	<body onload="createSearchFlags()">
 		<div id="login">
 			<img src="./media/img1.png" id="logo"></img>
 			<input type="text" id="Iusername" placeholder="Username"></input>
 			<input type="text" id="Ipassword" placeholder="Password"></input>
-			<input type="button" id="submit">Submit</input>
+			<input type="button" id="submit" value="Submit" onclick="verfyAccount()"></input>
 		</div>
 		<div id="wrapper">
+			<div id="searchBar" onload="createSearchFlags()">
+				<input type="date" id="Idate"></input>
+			</div>
+			
 			
 		</div>
 		
 		
-		<script src="https://www.gstatic.com/firebasejs/7.0.0/firebase.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.0.0/firebase-app.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.0.0/firebase-firestore.js"></script>
 		<script type="text/javascript" src="main.js"></script>
+		<script type="text/javascript" src="format.js"></script>
 	</body>
 </html>

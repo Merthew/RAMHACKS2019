@@ -29,7 +29,13 @@
 
 #submit {
 	position: absolute;
-	left: 5px;
+	left: calc(50vw - 50px);
+	top: 55vh;
+	text-align: center;
+	width: 100px;
+	border: outset;
+	background-color: white;
+	color: gray;
 }
 
 #wrapper{
@@ -40,5 +46,55 @@
 	height: 100%;
 	
 }
+	
+#searchBar {
+	border: inset;
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	padding: 5px;
+}
 
+li {
+	list-style-type: none;
+	padding-top: 10px;
+}
 
+.radio_no_D {
+	background: red !important;
+	width: 13px;
+	height: 13px;
+	display: inline-block;
+}
+
+.radio_no {
+	margin: 0px;
+}
+
+.radio_nu_D {
+	background: gray !important;
+	width: 13px;
+	height: 13px;
+	display: inline-block;
+}
+
+.radio_nu {
+	margin: 0px;
+}
+
+.radio_yes_D {
+	background: green !important;
+	width: 13px;
+	height: 13px;
+	display: inline-block;
+	margin-right: 5px;
+}
+
+.radio_yes {
+	margin: 0px;
+}
+
+.flag_input {
+	width: 50px;
+	margin-right: 5px;
+}

@@ -1,3 +1,10 @@
+//name of the object
+const name = "rooms";
+//preset list of flags for said object, priority is assumed
+const flags = ["priority", "capacity", "projector", "terminal", "whiteboard", "windows"];
+//preset types of the flags
+const types = ["int", "int", "bool", "bool", "bool", "bool"];
+//firebase config and call
 var firebaseConfig = {
 	apiKey: "AIzaSyDrcLe6_5LBPf_xsfCoWOGkFQepLz004SQ",
 	authDomain: "ramhacks2019-24f47.firebaseapp.com",
@@ -8,16 +15,17 @@ var firebaseConfig = {
 	appId: "1:356820442691:web:98a4bd51bcdf1b16e97ef6",
 	measurementId: "G-9P34LYCGV8"
 };
-var fb = firebase.initializeApp(firebaseConfig);
+var fb = firebase.firestore();
 
+//To create test data, would be set by another method/program.
 function createRooms() {
 
 	for(let i = 0; i < 500; i++){
 		let tcapacity = minmaxRand(20,1000);
-		let tterminal = (minmaxRand(0,100) >= 50) ? true : false;
-		let tprojector = (tterminal && minmaxRand(0,100) >= 50) ? true : false;
-		let twhiteboard = (minmaxRand(0,100) >= 50) ? true : false;
-		let twindows = (minmaxRand(0,100) >= 50) ? true : false;
+		let tterminal = (minmaxRand(0,100) >= 50) ? "true" : "false";
+		let tprojector = (tterminal == "true" && minmaxRand(0,100) >= 50) ? "true" : "false";
+		let twhiteboard = (minmaxRand(0,100) >= 50) ? "true" : "false";
+		let twindows = (minmaxRand(0,100) >= 50) ? "true" : "false";
 		let tpriority = minmaxRand(0, 11);
 
 
@@ -32,6 +40,8 @@ function createRooms() {
 	}
 }
 
+
+//Created methods.
 function minmaxRand(min, max){//test code
 	return Math.floor(Math.random() * (+max - +min)) + +min;
 }
@@ -48,41 +58,20 @@ function addonedate(date, username, inTime, outTime, room){//book a room
 	}
 }
 
-/*function bookRoom(roomNum, date, inTime, outTime) {
-	//check if currDate is null	return
-	return new Promise((resolve, reject) => {
-		let ref = fb.database().ref('rooms/' + roomNum + '/dates/' + date);
-		ref.on('value', snapshot => {
-			let k = snapshot;
-			resolve(k);
-		});
-	}).then((k) => {
-		
-		givenRoomData = Object.keys(k.val());
-		
-		for(let t = 0; t < givenRoomData.length; ++t) {//check against desired time
-			//if (inTime<givenRoomData[t])
-			//if valid, call addonedate
-			//else log error
-			console.log(givenRoomData[t]);
-			console.log(k[givenRoomData[t]].userName);
-		}
-	})
-}*/
-
-var roomNum, date, inTime, outTime;
-
 function bookRoom(roomNum, date, inTime, outTime) {
 	let ref = fb.database().ref('rooms/' + roomNum + '/dates/' + date);
 	ref.on('value', data => {
-		console.log(data);
-		console.log(data.val());
-		console.log(data[inTime]);
-		
 		let k = data.val();
-		console.log(k[inTime].endTime);
+		//console.log(k[inTime].endTime);
+		let keys = Object.keys(k);
+		if(!keys.includes(inTime)){
+			console.log("Not there");
+		}
+		else {
+			console.log("There");
+		}
 	}, data => {
-		//console.log(" ");
+		
 	});
 }
 
@@ -141,8 +130,4 @@ function printOut(data){
 
 function printErr(data){
 	console.log("ERROR BROKEN");
-}
-
-function addDate(index){
-
 }
