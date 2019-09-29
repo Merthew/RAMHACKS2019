@@ -11,7 +11,7 @@ var firebaseConfig = {
 var fb = firebase.initializeApp(firebaseConfig);
 
 function createRooms() {
-	
+
 	for(let i = 0; i < 500; i++){
 		let tcapacity = minmaxRand(20,1000);
 		let tterminal = (minmaxRand(0,100) >= 50) ? true : false;
@@ -19,8 +19,8 @@ function createRooms() {
 		let twhiteboard = (minmaxRand(0,100) >= 50) ? true : false;
 		let twindows = (minmaxRand(0,100) >= 50) ? true : false;
 		let tpriority = minmaxRand(0, 11);
-		
-		
+
+
 		fb.database().ref('rooms/1' + i + "/flags").set({
 			capacity: tcapacity,
 			terminal: tterminal,
@@ -32,21 +32,45 @@ function createRooms() {
 	}
 }
 
-function minmaxRand(min, max){
-	return Math.floor(Math.random() * (+max - +min)) + +min; 
+function minmaxRand(min, max){//test code
+	return Math.floor(Math.random() * (+max - +min)) + +min;
 }
 
 
-function addonedate(num, name, inT, out, room){
-	fb.database().ref('rooms/1' + room + "/dates/" + num + "/" + name).set({
-		startTime: inT,
-		endTime: out,
-	});
+function addonedate(date, username, inTime, outTime, room){//book a room
+	if (!(date == null)){
+		displayDay
+		fb.database().ref('rooms/1' + room + "/dates/" + date + "/" + inTime).set({
+			//startTime: inTime,
+			endTime: outTime,
+			userName: username,
+		});
+	}
 }
 
-function displayToday(roomNum) {
-	new Promise((resolve, reject) => {	
-		let ref = fb.database().ref('rooms/' + roomNum + '/dates/0');
+function bookRoom(roomNum, date, inTime, outTime) {
+	//check if currDate is null	return
+	return new Promise((resolve, reject) => {
+		let ref = fb.database().ref('rooms/' + roomNum + '/dates/' + date);
+		ref.on('value', snapshot => {
+			let k = Object.keys(snapshot.val());
+			resolve(k);
+		});
+	}).then(givenRoomData => {
+		for(let t = 0; t < givenRoomData.length; ++t) {//check against desired time
+			//if (inTime<givenRoomData[t])
+			//if valid, call addonedate
+			//else log error
+			console.log(givenRoomData[t]);
+			console.log(givenRoomData[t].userName);
+		}
+	})
+}
+
+
+function displayDay(roomNum, date) {//output bookings for given room for today
+	new Promise((resolve, reject) => {
+		let ref = fb.database().ref('rooms/' + roomNum + '/dates/' + date);
 		ref.on('value', snapshot => {
 			console.log(snapshot);
 			console.log(snapshot.val());
@@ -100,5 +124,5 @@ function printErr(data){
 }
 
 function addDate(index){
-	
+
 }
