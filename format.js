@@ -4,7 +4,7 @@ var userId;
 function verfyAccount(){
 	var email = document.getElementById("Iusername").value;
 	var pass = document.getElementById("Ipassword").value;
-	
+
 	firebase.auth().signInWithEmailAndPassword(email, pass).then(function(res){
 		document.getElementById("login").style.display = "none";
 		fb.collection("users").doc(firebase.auth().currentUser.uid).get().then(doc =>{
@@ -14,11 +14,11 @@ function verfyAccount(){
 	}).catch(function(error) {
 		var errorCode = error.code;
 		var errorMessage = error.message;
-		
+
 		console.log(errorCode);
 		console.log(errorMessage);
 	});
-	
+
 	firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
 	  .then(function() {
 		return firebase.auth().signInWithEmailAndPassword(email, password);
@@ -28,31 +28,31 @@ function verfyAccount(){
 		var errorCode = error.code;
 		var errorMessage = error.message;
 	  });
-	
-	
-	
+
+
+
 }
 
 function createSearchFlags(){
-	
+
 	var d = new Date();
 	var day = d.getDate();
 	var month = (d.getMonth() + 1);
 	var year = d.getFullYear();
-	
+
 	if(month <= 9){
 		month = "0" + month;
 	}
-	
+
 	var min = year + "-" + month + "-" + day;
 	var max = (year + 1) + "-" + month + "-" + day;
-	
+
 	document.getElementById("Idate").min = min;
 	document.getElementById("Idate").max = max;
-	
+
 	for(let i = 0; i < flags.length; i++){
 		if(flags[i] == "priority"){
-			
+
 		}
 		else if(types[i] == "bool"){
 			var node = document.createElement("LI");
@@ -65,7 +65,7 @@ function createSearchFlags(){
 			no.id = flags[i] + "no";
 			no.className = "radio_no";
 			dno.appendChild(no);
-			
+
 			var dnu = document.createElement("DIV");
 			dnu.className = "radio_nu_D";
 			var nu = document.createElement("INPUT");
@@ -75,7 +75,7 @@ function createSearchFlags(){
 			nu.checked = "checked";
 			nu.className = "radio_no";
 			dnu.appendChild(nu);
-			
+
 			var dyes = document.createElement("DIV");
 			dyes.className = "radio_yes_D";
 			var yes = document.createElement("INPUT");
@@ -84,7 +84,7 @@ function createSearchFlags(){
 			yes.id = flags[i] + "yes";
 			yes.className = "radio_yes";
 			dyes.appendChild(yes)
-			
+
 			var label = document.createTextNode(flags[i]);
 			node.appendChild(dno);
 			node.appendChild(dnu);
@@ -100,35 +100,36 @@ function createSearchFlags(){
 			min.placeholder = "min";
 			min.id = flags[i] + "min";
 			min.className = "flag_input";
-			
+
 			var label = document.createTextNode(flags[i]);
-			
+
 			node.appendChild(min);
 			node.appendChild(label);
 			document.getElementById("searchBar").appendChild(node);
 		}
 
 	}
-	
-		
+
+
 	var bsub = document.createElement("INPUT");
 	bsub.type = "button";
 	bsub.value = "Submit";
 	bsub.style.border = "outset";
 	bsub.style.m
 	bsub.onclick = function() {drawAvalibilities();};
-	
+
 	document.getElementById("searchBar").appendChild(bsub);
 }
 
 
 var queryList = [];
+var searchPromiseArr = [];
 
 function drawAvalibilities(){
-	new Promise((resolve, reject) => {
+	// new Promise((resolve, reject) => {
 		console.log(">>Submitted.");
 		var param = [];
-		for(let i = 0; i < flags.length; i ++){
+		for(let i = 0; i < flags.length; i ++){//get type of each flag
 			if(flags[i] == "priority"){
 				param.push(null);
 			}
@@ -149,58 +150,56 @@ function drawAvalibilities(){
 		}
 
 
-		
+
 		var objRef = fb.collection(name);
-		for(let i = 1; i < flags.length; i++){
-			if(param[i] != null){
+		for(let i = 1; i < flags.length; i++){//for each flag given
+			if(param[i] != null){//if not null, query for flag
 				if(types[i] == "int"){
 					console.log("current element is a number");
 					let key = "flags." + flags[i];
 					var query = objRef.where(key, ">=", parseInt(param[i]));
-					query.get().then(function(querySnapshot) {
+					searchPromiseArr.push(query.get().then(function(querySnapshot) {
 						querySnapshot.forEach(function(doc) {
 							console.log(doc.id);
-							queryList.push({"n" + i,doc.id});
+							queryList.push(["n" + i,doc.id]);
 						});
 					}).catch(function(error) {
 						console.log("Error getting documents: ", error);
-					});
+					}))
 				}
 				else {
-					console.log("current element is not a number");
+					console.log("current element is not a number");//so we can do a where
 					let key = "flags." + flags[i];
 					var query = objRef.where(key, "==", param[i]);
-					
-					query.get().then(querySnapshot => {
+
+					searchPromiseArr.push(query.get().then(querySnapshot => {
 						querySnapshot.forEach( doc => {
 							console.log(doc.id);
-							queryList.push({"n" + i, doc.id});
+							queryList.push(["n" + i, doc.id]);
 						});
 					}).catch(function(error) {
 						console.log("Error getting documents: ", error);
-					});
+					}));
 				}
 			}
 			else {
 				console.log("this is null");
 			}
 		}
-		
-		
-		var iDate = document.getElementById("Idate").value;
-		resolve(iDate);
-	}).finally(is => {
-		
-		
 
-		console.log(queryList);
-
-
-		//for(let i = 0; i < queryList.length; i ++){
-			//drawEntry(
-		//}
-	});
-	
+		//
+		// var iDate = document.getElementById("Idate").value;
+		// resolve(iDate);
+	// }).finally(is => {
+	// 	console.log(queryList);
+	// 	//for(let i = 0; i < queryList.length; i ++){
+	// 		//drawEntry(
+	// 	//}
+	// });
+	Promise.all(searchPromiseArr).then(() => {
+			console.log("Search complete");
+			console.log(queryList);//do something to the arrays to collate them 
+	})
 }
 
 function countList(num){
@@ -228,15 +227,15 @@ function drawEntry(objName, iDate){
 		node.appendChild(nDiv);
 	}
 	document.getElementById("area").appendChild(node);
-	
-	
+
+
 	fb.collection(name).doc(objName).get().then(doc => {
 		var date = doc.data().dates;
 		for(let i = 0; i < date.length; i ++){
 			if(date[i].day == iDate){
 				console.log("date" + date[i].day);
-				
+
 			}
 		}
 	});
-}	
+}
