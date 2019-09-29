@@ -4,7 +4,7 @@ var userId;
 function verfyAccount(){
 	var email = document.getElementById("Iusername").value;
 	var pass = document.getElementById("Ipassword").value;
-	
+
 	firebase.auth().signInWithEmailAndPassword(email, pass).then(function(res){
 		document.getElementById("login").style.display = "none";
 		fb.collection("users").doc(firebase.auth().currentUser.uid).get().then(doc =>{
@@ -14,11 +14,11 @@ function verfyAccount(){
 	}).catch(function(error) {
 		var errorCode = error.code;
 		var errorMessage = error.message;
-		
+
 		console.log(errorCode);
 		console.log(errorMessage);
 	});
-	
+
 	firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
 	  .then(function() {
 		return firebase.auth().signInWithEmailAndPassword(email, password);
@@ -28,31 +28,31 @@ function verfyAccount(){
 		var errorCode = error.code;
 		var errorMessage = error.message;
 	  });
-	
-	
-	
+
+
+
 }
 
 function createSearchFlags(){
-	
+
 	var d = new Date();
 	var day = d.getDate();
 	var month = (d.getMonth() + 1);
 	var year = d.getFullYear();
-	
+
 	if(month <= 9){
 		month = "0" + month;
 	}
-	
+
 	var min = year + "-" + month + "-" + day;
 	var max = (year + 1) + "-" + month + "-" + day;
-	
+
 	document.getElementById("Idate").min = min;
 	document.getElementById("Idate").max = max;
-	
+
 	for(let i = 0; i < flags.length; i++){
 		if(flags[i] == "priority"){
-			
+
 		}
 		else if(types[i] == "bool"){
 			var node = document.createElement("LI");
@@ -65,7 +65,7 @@ function createSearchFlags(){
 			no.id = flags[i] + "no";
 			no.className = "radio_no";
 			dno.appendChild(no);
-			
+
 			var dnu = document.createElement("DIV");
 			dnu.className = "radio_nu_D";
 			var nu = document.createElement("INPUT");
@@ -75,7 +75,7 @@ function createSearchFlags(){
 			nu.checked = "checked";
 			nu.className = "radio_no";
 			dnu.appendChild(nu);
-			
+
 			var dyes = document.createElement("DIV");
 			dyes.className = "radio_yes_D";
 			var yes = document.createElement("INPUT");
@@ -84,7 +84,7 @@ function createSearchFlags(){
 			yes.id = flags[i] + "yes";
 			yes.className = "radio_yes";
 			dyes.appendChild(yes)
-			
+
 			var label = document.createTextNode(flags[i]);
 			node.appendChild(dno);
 			node.appendChild(dnu);
@@ -100,30 +100,31 @@ function createSearchFlags(){
 			min.placeholder = "min";
 			min.id = flags[i] + "min";
 			min.className = "flag_input";
-			
+
 			var label = document.createTextNode(flags[i]);
-			
+
 			node.appendChild(min);
 			node.appendChild(label);
 			document.getElementById("searchBar").appendChild(node);
 		}
 
 	}
-	
-		
+
+
 	var bsub = document.createElement("INPUT");
 	bsub.type = "button";
 	bsub.value = "Submit";
 	bsub.style.border = "outset";
 	bsub.style.m
 	bsub.onclick = function() {drawAvalibilities();};
-	
+
 	document.getElementById("searchBar").appendChild(bsub);
 }
 
 
 var queryList = [];
 var searchPromiseArr = [];
+var totalList = [];
 
 function drawAvalibilities(){
 	// new Promise((resolve, reject) => {
@@ -159,9 +160,13 @@ function drawAvalibilities(){
 					let key = "flags." + flags[i];
 					var query = objRef.where(key, ">=", parseInt(param[i]));
 					searchPromiseArr.push(query.get().then(function(querySnapshot) {
+						let tempList = [];
 						querySnapshot.forEach(function(doc) {
-							queryList.push(doc.id);
+							//console.log(doc.id);
+							tempList.push(doc.id);
+							// queryList.push([i,doc.id]);
 						});
+						queryList.push(tempList);
 					}).catch(function(error) {
 						console.log("Error getting documents: ", error);
 					}))
@@ -172,9 +177,13 @@ function drawAvalibilities(){
 					var query = objRef.where(key, "==", param[i]);
 
 					searchPromiseArr.push(query.get().then(querySnapshot => {
+						let tempList = [];
 						querySnapshot.forEach( doc => {
-							queryList.push(doc.id);
+						//	console.log(doc.id);
+						tempList.push(doc.id);
+							// queryList.push([i, doc.id]);
 						});
+						queryList.push(tempList);
 					}).catch(function(error) {
 						console.log("Error getting documents: ", error);
 					}));
@@ -185,19 +194,33 @@ function drawAvalibilities(){
 			}
 		}
 
+		//
+		// var iDate = document.getElementById("Idate").value;
+		// resolve(iDate);
+	// }).finally(is => {
+	// 	console.log(queryList);
+	// 	//for(let i = 0; i < queryList.length; i ++){
+	// 		//drawEntry(
+	// 	//}
+	// });
 	Promise.all(searchPromiseArr).then(() => {
 			console.log("Search complete");
 			console.log(queryList);//do something to the arrays to collate them
-				
-			const itemListNode = document.getElementById("area");
-			while (itemListNode.firstChild) {
-				itemListNode.removeChild(itemListNode.firstChild);
+			for (let i = 0; i < queryList[0].length; ++i) {//for each element in the first array
+				let tempFlag = 0;
+				for (let k = 0; k < queryList.length; ++k) {
+					for (let j = 0; j < queryList[k].length; ++j) {//check against other arrays
+						if(queryList[0][i] === (queryList[k][j])) {
+							++tempFlag;
+						}
+					}
+				}
+				if (tempFlag == queryList.length) {
+					totalList.push(queryList[0][i]);
+				}
 			}
-			
-			let n = document.getElementById("Idate").value;
-			for(let i = 0; i < 5; i ++){
-				drawEntry(queryList[i], n);
-			}
+	}).then(() => {
+		console.log(totalList);
 	})
 }
 
@@ -210,41 +233,31 @@ function countList(num){
 	return count;
 }
 
-
-
-
 function drawEntry(objName, iDate){
+	var lables = ["8:00", "8:30", "9:00", "9:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "16:30", "17:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30"];
+	var node = document.createElement("LI");
+	node.id = "l" + objName;
+	var textN = document.createElement("DIV");
+	textN.className = "v_label";
+	textN.innerHTML = objName;
+	node.appendChild(textN);
+	for(let i = 0; i < 24; i ++){
+		var nDiv = document.createElement("DIV");
+		nDiv.className = "v_div";
+		nDiv.id = objName + "_" + i
+		nDiv.title = lables[i];
+		node.appendChild(nDiv);
+	}
+	document.getElementById("area").appendChild(node);
+
+
 	fb.collection(name).doc(objName).get().then(doc => {
 		var date = doc.data().dates;
-		if(date != null){
-			var lables = ["0800", "0830", "0900", "0930", "1000", "1030", "1100", "1130", "1200", "1230", "1300", "1330", "1400", "1430", "1500", "1630", "1700", "1830", "1900", "1930", "2000", "2030", "2100", "2130"];
-			var node = document.createElement("LI");
-			node.id = "l" + objName;
-			var textN = document.createElement("DIV");
-			textN.className = "v_label";
-			textN.innerHTML = objName;
-			node.appendChild(textN);
-			for(let i = 0; i < 24; i ++){
-				var nDiv = document.createElement("DIV");
-				nDiv.className = "v_div";
-				nDiv.id = objName + "_" + i
-				nDiv.title = lables[i];
-				node.appendChild(nDiv);
-			}
-			document.getElementById("area").appendChild(node);
-		}
 		for(let i = 0; i < date.length; i ++){
 			if(date[i].day == iDate){
 				console.log("date" + date[i].day);
-				let end = lables.indexOf(date[i].endTime);
-				let start = lables.indexOf(date[i].startTime);
-				
-				
-				for(let i = start; i <= end; i ++){
-					let name = objName + "_" + i;
-					document.getElementById(name).style.background = "red";
-				}				
+
 			}
 		}
 	});
-}	
+}
