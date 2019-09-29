@@ -5,7 +5,7 @@ const flags = ["priority", "capacity", "projector", "terminal", "whiteboard", "w
 //preset types of the flags
 const types = ["int", "int", "bool", "bool", "bool", "bool"];
 //firebase config and call
-var firebaseConfig = {
+var config = {
 	apiKey: "AIzaSyDrcLe6_5LBPf_xsfCoWOGkFQepLz004SQ",
 	authDomain: "ramhacks2019-24f47.firebaseapp.com",
 	databaseURL: "https://ramhacks2019-24f47.firebaseio.com",
@@ -15,7 +15,9 @@ var firebaseConfig = {
 	appId: "1:356820442691:web:98a4bd51bcdf1b16e97ef6",
 	measurementId: "G-9P34LYCGV8"
 };
-var fb = firebase.firestore();
+var app = firebase.initializeApp(config);
+var fb = firebase.firestore(app);
+
 
 //To create test data, would be set by another method/program.
 function createRooms() {
@@ -29,13 +31,15 @@ function createRooms() {
 		let tpriority = minmaxRand(0, 11);
 
 
-		fb.database().ref('rooms/1' + i + "/flags").set({
-			capacity: tcapacity,
-			terminal: tterminal,
-			projector: tprojector,
-			whiteboard: twhiteboard,
-			windows: twindows,
-			priority: tpriority,
+		fb.collection("rooms").add({
+			flags: {
+				capacity: tcapacity,
+				terminal: tterminal,
+				projector: tprojector,
+				whiteboard: twhiteboard,
+				windows: twindows,
+				priority: tpriority,
+			},
 		});
 	}
 }
