@@ -27,6 +27,17 @@
 	border: inset;
 }
 
+#login>input[type=password]{
+	position: relative;
+	display: inline-block;
+	margin:auto;
+	text-align: center;
+	width: 200px;
+	height: 30px;
+	top: calc(50vh - 30px);
+	border: inset;
+}
+
 #submit {
 	position: absolute;
 	left: calc(50vw - 50px);
@@ -97,4 +108,24 @@ li {
 .flag_input {
 	width: 50px;
 	margin-right: 5px;
+}
+
+
+
+#area {
+	position: absolute;
+	left: 225px;
+	top: 5px;
+}
+.v_label{
+	display: inline-block;
+	padding-right: 5px;
+}
+
+.v_div {
+	display: inline-block;
+	width: 40px;
+	height: 10px;
+	border-left: 1px solid;
+	background-color: green;
 }

@@ -29,9 +29,10 @@ function createRooms() {
 		let twhiteboard = (minmaxRand(0,100) >= 50) ? "true" : "false";
 		let twindows = (minmaxRand(0,100) >= 50) ? "true" : "false";
 		let tpriority = minmaxRand(0, 11);
+		let tname = ("" + minmaxRand(0, 99)).padStart(2, '0') + ("" + minmaxRand(0,999)).padStart(3, '0');
 
 
-		fb.collection("rooms").add({
+		fb.collection(name).doc(tname).set({
 			flags: {
 				capacity: tcapacity,
 				terminal: tterminal,
@@ -40,98 +41,68 @@ function createRooms() {
 				windows: twindows,
 				priority: tpriority,
 			},
+			dates: []
 		});
 	}
 }
 
-
-//Created methods.
-function minmaxRand(min, max){//test code
+function minmaxRand(min, max){
 	return Math.floor(Math.random() * (+max - +min)) + +min;
 }
 
 
-function addonedate(date, username, inTime, outTime, room){//book a room
-	if (!(date == null)){
-		displayDay
-		fb.database().ref('rooms/1' + room + "/dates/" + date + "/" + inTime).set({
-			//startTime: inTime,
-			endTime: outTime,
-			userName: username,
-		});
-	}
-}
 
-function bookRoom(roomNum, date, inTime, outTime) {
-	let ref = fb.database().ref('rooms/' + roomNum + '/dates/' + date);
-	ref.on('value', data => {
-		let k = data.val();
-		//console.log(k[inTime].endTime);
-		let keys = Object.keys(k);
-		if(!keys.includes(inTime)){
-			console.log("Not there");
-		}
-		else {
-			console.log("There");
-		}
-	}, data => {
-		
-	});
-}
-
-
-
-function displayDay(roomNum, date) {//output bookings for given room for today
+//Created methods.
+function reserveItem(objName, start, end, date){
 	new Promise((resolve, reject) => {
-		let ref = fb.database().ref('rooms/' + roomNum + '/dates/' + date);
-		ref.on('value', snapshot => {
-			console.log(snapshot);
-			console.log(snapshot.val());
-			let k = Object.keys(snapshot.val());
-			resolve(k);
+		fb.collection(name).doc(objName).get().then(doc => {
+			if (doc.exists) {
+				let Adates = doc.data().dates;
+				if(Adates.length >= 1){
+					for(let i = 0; i < Adates.length; i ++){
+						let sStart = Adates[i].startTime;
+						let sEnd = Adates[i].endTime;
+						if(Number(date) == Adates[i].day){
+							if(Number(start) < Number(end)){
+								if(Number(start) <= Number(sStart) && Number(end) <= Number(sStart)){
+									console.log("Valid");
+									resolve(true);
+								}
+								else if(Number(start) >= Number(sEnd) && Number(end) >= Number(sEnd)){
+									console.log("Valid");
+									resolve(true);
+								}
+								else{
+									console.log("Invalid");
+									resolve(false);
+								}
+							}
+							else{
+								console.log("Invalid");
+								resolve(false);
+							}
+						}
+						else {
+							resolve(true);
+						}
+					}
+				}
+				else{
+					resolve(true);
+				}
+			}else {
+				console.log("Invalid");
+				resolve(false);
+			}
 		});
-	}).then(k => {
-		console.log(k);
+	}).then(isValid => {
+		console.log("Is Valid: " + isValid);
+		if(isValid){
+			fb.collection(name).doc(objName).update({
+				dates: firebase.firestore.FieldValue.arrayUnion({day: date, startTime: start, endTime: end, user: userId})
+			});
+		}
 	});
-}
 
-function incrementCapacity(){
-	let promise1 = new Promise(function(resolve, reject) {
-		let capacity = 0;
-		let ref = fb.database().ref('rooms/10/capacity');
-		ref.on('value', function(snapshot) {
-			capacity = snapshot.val();
-			resolve(capacity);
-		});
-	}).then(function(capacity){
-		capacity += 1;
-		fb.database().ref('rooms/10/capacity').set(capacity);
-	});
-}
-
-var index;
-
-function print1(index){
-	let ref = fb.database().ref('rooms');
-	ref.on('value', printOut, printErr);
-	this.index = index;
-}
-
-function printOut(data){
-	var rooms = data.val();
-	var roomName = Object.keys(rooms);
-	var k = rooms[(roomName[index].toString())].flags;
-	console.log(k);
-	var keys = Object.keys(k);
-	var n = "";
-	for(let i = 0; i < keys.length; i ++){
-		var l = k[keys[i]];
-		n += l + "\n";
-	}
-	output.innerHTML = n;
-
-}
-
-function printErr(data){
-	console.log("ERROR BROKEN");
+	
 }
