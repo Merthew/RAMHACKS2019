@@ -48,24 +48,44 @@ function addonedate(date, username, inTime, outTime, room){//book a room
 	}
 }
 
-function bookRoom(roomNum, date, inTime, outTime) {
+/*function bookRoom(roomNum, date, inTime, outTime) {
 	//check if currDate is null	return
 	return new Promise((resolve, reject) => {
 		let ref = fb.database().ref('rooms/' + roomNum + '/dates/' + date);
 		ref.on('value', snapshot => {
-			let k = Object.keys(snapshot.val());
+			let k = snapshot;
 			resolve(k);
 		});
-	}).then(givenRoomData => {
+	}).then((k) => {
+		
+		givenRoomData = Object.keys(k.val());
+		
 		for(let t = 0; t < givenRoomData.length; ++t) {//check against desired time
 			//if (inTime<givenRoomData[t])
 			//if valid, call addonedate
 			//else log error
 			console.log(givenRoomData[t]);
-			console.log(givenRoomData[t].userName);
+			console.log(k[givenRoomData[t]].userName);
 		}
 	})
+}*/
+
+var roomNum, date, inTime, outTime;
+
+function bookRoom(roomNum, date, inTime, outTime) {
+	let ref = fb.database().ref('rooms/' + roomNum + '/dates/' + date);
+	ref.on('value', data => {
+		console.log(data);
+		console.log(data.val());
+		console.log(data[inTime]);
+		
+		let k = data.val();
+		console.log(k[inTime].endTime);
+	}, data => {
+		//console.log(" ");
+	});
 }
+
 
 
 function displayDay(roomNum, date) {//output bookings for given room for today
